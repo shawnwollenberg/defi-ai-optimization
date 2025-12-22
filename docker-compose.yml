@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: defi-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-defi_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-defi_password}
+      POSTGRES_DB: ${POSTGRES_DB:-defi_optimization}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-defi_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: defi-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend/api
+      dockerfile: ../../docker/Dockerfile.api
+    container_name: defi-api
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER:-defi_user}:${POSTGRES_PASSWORD:-defi_password}@postgres:5432/${POSTGRES_DB:-defi_optimization}
+      - REDIS_URL=redis://redis:6379
+      - ML_SERVICE_URL=http://ml-service:8001
+      - JWT_SECRET=${JWT_SECRET}
+      - ETH_RPC_URL=${ETH_RPC_URL}
+      - BASE_RPC_URL=${BASE_RPC_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ml-service:
+        condition: service_started
+
+  defi-service:
+    build:
+      context: ./backend/defi-service
+      dockerfile: ../../docker/Dockerfile.defi-service
+    container_name: defi-defi-service
+    ports:
+      - "8081:8081"
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER:-defi_user}:${POSTGRES_PASSWORD:-defi_password}@postgres:5432/${POSTGRES_DB:-defi_optimization}
+      - REDIS_URL=redis://redis:6379
+      - ETH_RPC_URL=${ETH_RPC_URL}
+      - BASE_RPC_URL=${BASE_RPC_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: ../docker/Dockerfile.ml-service
+    container_name: defi-ml-service
+    ports:
+      - "8001:8001"
+    environment:
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  wallet:
+    build:
+      context: ./backend/wallet
+      dockerfile: ../../docker/Dockerfile.wallet
+    container_name: defi-wallet
+    ports:
+      - "8082:8082"
+    environment:
+      - ETH_RPC_URL=${ETH_RPC_URL}
+      - BASE_RPC_URL=${BASE_RPC_URL}
+      - WALLETCONNECT_PROJECT_ID=${WALLETCONNECT_PROJECT_ID}
+
+  automation:
+    build:
+      context: ./backend/automation
+      dockerfile: ../../docker/Dockerfile.automation
+    container_name: defi-automation
+    ports:
+      - "8083:8083"
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER:-defi_user}:${POSTGRES_PASSWORD:-defi_password}@postgres:5432/${POSTGRES_DB:-defi_optimization}
+      - REDIS_URL=redis://redis:6379
+      - DEFI_SERVICE_URL=http://defi-service:8081
+      - WALLET_SERVICE_URL=http://wallet:8082
+      - ML_SERVICE_URL=http://ml-service:8001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      defi-service:
+        condition: service_started
+      wallet:
+        condition: service_started
+      ml-service:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  redis_data:
+

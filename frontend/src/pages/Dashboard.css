@@ -1,0 +1,107 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dashboard h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 100%);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid #3a4166;
+}
+
+.stat-card h3 {
+  color: #a0aec0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.risk-high {
+  color: #ef4444;
+}
+
+.risk-low {
+  color: #10b981;
+}
+
+.chart-section,
+.risk-section {
+  background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 100%);
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 1px solid #3a4166;
+}
+
+.chart-section h2,
+.risk-section h2 {
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+}
+
+.risk-card {
+  background-color: rgba(102, 126, 234, 0.1);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.risk-level {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.risk-critical {
+  color: #ef4444;
+}
+
+.risk-high {
+  color: #f59e0b;
+}
+
+.risk-medium {
+  color: #fbbf24;
+}
+
+.risk-low {
+  color: #10b981;
+}
+
+.risk-confidence {
+  color: #a0aec0;
+  margin-bottom: 1rem;
+}
+
+.recommendations {
+  list-style: none;
+  padding: 0;
+}
+
+.recommendations li {
+  padding: 0.5rem 0;
+  color: #cbd5e0;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.recommendations li:last-child {
+  border-bottom: none;
+}
+
