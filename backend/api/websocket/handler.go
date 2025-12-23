@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/defioptimization/api/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )

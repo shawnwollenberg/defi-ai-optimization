@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -238,10 +239,16 @@ func (e *Engine) checkRiskThreshold(ctx context.Context, rule models.AutomationR
 		"positions":    []interface{}{},
 	}
 
-	reqJSON, _ := json.Marshal(reqBody)
-	req, _ := http.NewRequest("POST", url, nil)
+	reqJSON, err := json.Marshal(reqBody)
+	if err != nil {
+		return false, err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqJSON))
+	if err != nil {
+		return false, err
+	}
 	req.Header.Set("Content-Type", "application/json")
-	// Note: In production, you'd properly set the request body
 
 	resp, err := e.httpClient.Do(req)
 	if err != nil {

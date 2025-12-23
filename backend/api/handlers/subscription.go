@@ -32,8 +32,6 @@ type UpgradeSubscriptionRequest struct {
 
 // UpgradeSubscription upgrades the user's subscription
 func UpgradeSubscription(c *gin.Context) {
-	userID, _ := c.Get("user_id")
-
 	var req UpgradeSubscriptionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -41,6 +39,6 @@ func UpgradeSubscription(c *gin.Context) {
 	}
 
 	// Create Stripe checkout session
-	handlers.CreateCheckoutSession(c)
+	CreateCheckoutSession(c)
 }
 
